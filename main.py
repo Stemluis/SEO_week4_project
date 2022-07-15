@@ -2,7 +2,6 @@ from flask import Flask, render_template, url_for, flash, redirect
 from forms import AddPhone, AddItemForm
 from flask_behind_proxy import FlaskBehindProxy
 from flask_sqlalchemy import SQLAlchemy
-from pandas import DataFrame
 
 app = Flask(__name__)
 proxied = FlaskBehindProxy(app)  ## add this line
@@ -28,15 +27,15 @@ def home():
         db.create_all()
         return redirect(url_for('new'))
     else:
-        return render_template('options.html', subtitle='Home Page', food_items=food_item.query.all())
+        return render_template('home.html', subtitle='Home', food_items=food_item.query.all())
 
 @app.route("/new", methods=['GET', 'POST'])
 def new():
     form = AddPhone()
     if form.validate_on_submit(): # checks if entries are valid
         phone = form.phone_number.data
-        return render_template('options.html', title="Options")
-    return render_template('new_database.html', title='Add Phone', form=form)
+        return render_template('home.html', title="Home")
+    return render_template('new.html', title='Add Phone', form=form)
 
 @app.route("/add", methods=['GET', 'POST'])
 def add():
@@ -52,7 +51,7 @@ def add():
         db.session.commit()
         flash(f'{form.item_name.data} added!', 'success')
         return redirect(url_for('home')) # if so - send to home page
-    return render_template('add_item.html', title='Add Item', form=form)
+    return render_template('add.html', title='Add Item', form=form)
 
 # @app.route("/show", methods=['GET', 'POST'])
 # def show():

@@ -43,3 +43,7 @@ class AddItemForm(FlaskForm):
     expiration_date = DateField('Expiration Date', format='%Y-%m-%d',
                                     validators=[DataRequired()])
     submit = SubmitField('Add Item')
+
+    def validate_expiration_date(form, field):
+        if field.data < form.purchase_date.data:
+            raise ValidationError("End date must not be earlier than start date.")
