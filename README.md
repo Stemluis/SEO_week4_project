@@ -1,6 +1,6 @@
 # SEO_week4_project
 
-##Contributors
+## Contributors
 * Kehinde Ayeyemi
 * Nile Lee
 * Luis Pagan
