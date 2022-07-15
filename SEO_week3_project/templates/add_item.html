@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="content-section">
+  <form method="POST" action="">
+    {{ form.hidden_tag() }}
+    <fieldset class="form-group">
+      <div class="form-group">
+        {{ form.item_name.label(class="form-control-label") }}
+        {% if form.item_name.errors %}
+        {{ form.item_name(class="form-control form-control-lg is-invalid") }}
+        <div class="invalid-feedback"> {% for error in form.item_name.errors%} <span>{{error}}</span> {% endfor %} </div> {% else %} {{ form.item_name(class="form-control form-control-lg") }} {% endif %}
+      </div>
+      <div class="form-group">
+        {{ form.item_category.label(class="form-control-label") }} 
+        {% if form.item_category.errors %}
+        {{ form.item_category(class="form-control form-control-lg is-invalid") }}
+        <div class="invalid-feedback"> {% for error in form.item_category.errors%} <span>{{error}}</span> {% endfor %} </div> {% else %} {{ form.item_category(class="form-control form-control-lg") }} {% endif %}
+      </div>
+      <div class="form-group">
+        {{ form.purchase_date.label(class="form-control-label") }}
+        {% if form.purchase_date.errors %}
+        {{ form.purchase_date(class="form-control form-control-lg is-invalid") }}
+        <div class="invalid-feedback"> {% for error in form.purchase_date.errors%} <span>{{error}}</span> {% endfor %} </div> {% else %} {{ form.purchase_date(class="form-control form-control-lg") }} {% endif %}
+      </div>
+      <div class="form-group">
+        {{ form.expiration_date.label(class="form-control-label") }} {% if form.expiration_date.errors %} {{ form.expiration_date(class="form-control form-control-lg is-invalid") }}
+        <div class="invalid-feedback"> {% for error in form.expiration_date.errors%} <span>{{error}}</span> {% endfor %} </div> {% else %} {{ form.expiration_date(class="form-control form-control-lg") }} {% endif %}
+      </div>
+    </fieldset>
+    <div class="form-group">
+      {{ form.submit(class="btn btn-outline-info") }}
+    </div>
+  </form>
+</div> {% endblock content %}
