@@ -1,1 +1,0 @@
-# SEO_week3_project
