@@ -21,10 +21,12 @@ choices = [
             ("Frozen Foods", "Frozen Foods")
         ]
 
-class AddPhone(FlaskForm):
+class AddUser(FlaskForm):
+    name = StringField('Name',
+                            validators=[DataRequired(), Length(min=2, max=40)])
     phone_number = TelField('Telephone #',
                             validators=[DataRequired()])
-    submit = SubmitField("Add phone number")
+    submit = SubmitField("Add user")
 
     def validate_phone(form, field):
         try:
