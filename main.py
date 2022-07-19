@@ -29,6 +29,14 @@ def home():
     else:
         return render_template('home.html', subtitle='Home', food_items=food_item.query.all())
 
+@app.route("/show")
+def show():
+    if len(db.engine.table_names()) < 1:
+        db.create_all()
+        return redirect(url_for('new'))
+    else:
+        return render_template('show.html', subtitle='Items', food_items=food_item.query.all())
+
 @app.route("/new", methods=['GET', 'POST'])
 def new():
     form = AddPhone()
