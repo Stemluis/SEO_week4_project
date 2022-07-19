@@ -93,9 +93,9 @@ def add():
         return redirect(url_for('home')) # if so - send to home page
     return render_template('add.html', title='Add Item', form=form)
 
-# @app.route("/show", methods=['GET', 'POST'])
-# def show():
-#     return render_template('show.html', title='Show', food_items=food_item.query.all())
+@app.route("/about", methods=['GET'])
+def about():
+    return render_template('about.html', title='About')
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0")
