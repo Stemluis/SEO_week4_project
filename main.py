@@ -11,19 +11,23 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 db = SQLAlchemy(app)
 
 class food_item(db.Model):
-  id = db.Column(db.String(64), nullable=False)
-  purchase_date = db.Column(db.Date(), nullable=False)
-  expiration_date = db.Column(db.Date(), nullable=False)
-  item_name = db.Column(db.String(40), nullable=False)
-  item_category = db.Column(db.String(40), nullable=False)
+    __tablename__ = 'food_items'
+    id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String(64), nullable=False)
+    purchase_date = db.Column(db.Date(), nullable=False)
+    expiration_date = db.Column(db.Date(), nullable=False)
+    item_name = db.Column(db.String(40), nullable=False)
+    item_category = db.Column(db.String(40), nullable=False)
 
-  def __repr__(self):
-    return f"Food({self.item_name}, {self.expiration_date})"
+    def __repr__(self):
+        return f"Food({self.item_name}, {self.expiration_date})"
 
 class User(db.Model):
-    id = db.Column(db.String(64), nullable=False)
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String(64), nullable=False)
     name = db.Column(db.String(40), nullable=False)
-    phone_number = db.Column(sb.String(15), nullable=False)
+    phone_number = db.Column(db.String(15), nullable=False)
 
     def __repr__(self):
         return f"Food({self.name}, {self.phone_number})"
@@ -37,23 +41,35 @@ def home():
     else:
         return render_template('home.html', subtitle='Home', food_items=food_item.query.all())
 
+@app.route("/show")
+def show():
+    if len(db.engine.table_names()) < 1:
+        db.create_all()
+        return redirect(url_for('new'))
+    else:
+        return render_template('show.html', subtitle='Items', food_items=food_item.query.all())
+
 @app.route("/new", methods=['GET', 'POST'])
 def new():
     form = AddUser()
     if form.validate_on_submit(): # checks if entries are valid
         user = User(
-                    name=form.name.data
-                    phone_number=form.phone_number.data
-                    id = idHash(phone_number)
+                    name=form.name.data,
+                    phone_number=form.phone_number.data,
+                    uuid = idHash(form.phone_number.data).decode('utf-8')
                 )
+        db.session.add(user)
+        db.session.commit()
+        flash(f'{form.name.data} added!', 'success')
         return render_template('home.html', title="Home")
-    return render_template('new.html', title='Add Phone', form=form)
+    return render_template('new.html', title='Add user', form=form)
 
 @app.route("/add", methods=['GET', 'POST'])
 def add():
     form = AddItemForm()
     if form.validate_on_submit(): # checks if entries are valid
         item = food_item(
+                        uuid = User.query.all()[0].uuid,
                         purchase_date=form.purchase_date.data,
                         expiration_date=form.expiration_date.data,
                         item_name=form.item_name.data,
