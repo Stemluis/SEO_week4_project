@@ -2,9 +2,10 @@ table{
     width: 80%;
     margin: 10px auto;
     padding: 10px;
-    border: 1px solid;
+    border: 1px ;
     border-radius: 10px;
     text-align: center;
+    background-color: #70D242;
 }
 
 th{
@@ -22,35 +23,56 @@ body {
   text-align: center;
 }
 h1, h2, h3, h4, h5, h6 {
-  color: #444444;
+  color: darkgreen;
 }
 
-.subt{
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
+.site-header .container .navbar-brand  {
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
   font-size: 28px;
-}
-.bg-steel {
-  background-color: #5f788a;
-}
-
-.site-header .navbar-nav .nav-link {
-  color: #cbd5db;
+  color: darkgreen;
   text-align: right;
-  
+  float: right;
+  display: inline-block;
+  margin-left: 20px;
+} 
+.site-header .container .navbar-brand:hover{
+    color:white;
+}
+.site-header .container .logo{
+    max-width: 20%;
+    max-height: 60px;
+    border-radius: 50%;
+    border-color: white;
+    clip-path: circle();
+    background-color: white;
+}
+.navbar ul{
+    list-style: none;
+    padding: 0;
+    margin : 0;
+    text-align: right;
+}
+.navbar li{
+    display: inline-block;
+    padding-left: 10px;
+}
+.navbar a{
+    text-decoration: none;
+    color: white;
+    text-transform:uppercase;
+    font-weight: bold;
+    font-family:arial;
+}
+.navbar a:hover{
+    color: darkgreen;
 }
 
-.site-header .navbar-nav .nav-link:hover {
-  color: #ffffff;
-}
-
-.site-header .navbar-nav .nav-link.active {
-  font-weight: 500;
-}
 p{
     text-align: center;
     font-weight: 500;
     font-size: xx-large;
     text-transform: uppercase;
+    color:darkgreen;
 }
 button:hover{
     color: #70D242;
@@ -123,21 +145,33 @@ a.article-title:hover {
   
 img {
     object-fit: cover;
-    max-width: 100%;
+    width: 100%;
     height: auto;
 }
 
 .image {
-  margin: 30px;
+  margin: 0px 30px;
   margin-bottom:30px;
   border : 3px solid;
   border-top-color :  lightgreen;
   border-right-color : lightgreen;
   border-bottom-color : darkgreen;
   border-left-color: darkgreen;
-  width: 300px;
+  width: 100px;
+  height: 150px;
+  
 }
-/* .image{
-    width: 200px;
-    heig: auto;
-} */
+.card {
+	  float: left;
+      margin: 20px;
+      margin-left: 40px;
+	}
+
+.card div{
+    text-align: center;
+    color: darkgreen;
+}
+
+.card div:hover{
+    color:lightgreen;
+}
