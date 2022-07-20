@@ -65,7 +65,7 @@ def login():
             user = User(
                         name=form.name.data,
                         phone_number=form.phone_number.data,
-                        uuid = idHash(form.phone_number.data + form.name).decode('utf-8')
+                        uuid = idHash(form.phone_number.data + form.name.data).decode('utf-8')
                     )
             db.session.add(user)
             db.session.commit()
@@ -107,6 +107,10 @@ def add():
 @app.route("/about", methods=['GET'])
 def about():
     return render_template('about.html', title='About')
+
+@app.route("/support", methods=['GET'])
+def support():
+    return render_template('support.html', title='Support')
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0")
