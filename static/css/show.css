@@ -46,6 +46,15 @@ h1, h2, h3, h4, h5, h6 {
 .site-header .navbar-nav .nav-link.active {
   font-weight: 500;
 }
+p{
+    text-align: center;
+    font-weight: 500;
+    font-size: xx-large;
+    text-transform: uppercase;
+}
+button:hover{
+    color: #70D242;
+}
 
 .content-section {
   background: #ffffff;
@@ -111,3 +120,24 @@ a.article-title:hover {
 .bg-steel {
   background-color: #70D242;
 }
+  
+img {
+    object-fit: cover;
+    max-width: 100%;
+    height: auto;
+}
+
+.image {
+  margin: 30px;
+  margin-bottom:30px;
+  border : 3px solid;
+  border-top-color :  lightgreen;
+  border-right-color : lightgreen;
+  border-bottom-color : darkgreen;
+  border-left-color: darkgreen;
+  width: 300px;
+}
+/* .image{
+    width: 200px;
+    heig: auto;
+} */
