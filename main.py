@@ -2,7 +2,7 @@ from flask import Flask, render_template, url_for, flash, redirect
 from forms import AddUser, AddItemForm
 from flask_behind_proxy import FlaskBehindProxy
 from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import generate_password_hash as idHash
+#from flask_bcrypt import generate_password_hash as idHash 
 
 app = Flask(__name__)
 proxied = FlaskBehindProxy(app)  ## add this line
@@ -40,7 +40,9 @@ def home():
         return redirect(url_for('new'))
     else:
         return render_template('home.html', subtitle='Home', food_items=food_item.query.all())
-
+@app.route("/about")
+def about():
+        return render_template('about.html', subtitle='Items')
 @app.route("/show")
 def show():
     if len(db.engine.table_names()) < 1:
