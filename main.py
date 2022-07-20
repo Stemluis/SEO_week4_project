@@ -39,7 +39,7 @@ db.create_all()
 @app.route("/home")
 def home():
     if not session.get("uuid"):
-        return redirect(url_for('login'))
+        return redirect(url_for('about'))
     else:
         return render_template('home.html', subtitle='Home')
 
@@ -65,7 +65,7 @@ def login():
             user = User(
                         name=form.name.data,
                         phone_number=form.phone_number.data,
-                        uuid = idHash(form.phone_number.data).decode('utf-8')
+                        uuid = idHash(form.phone_number.data + form.name).decode('utf-8')
                     )
             db.session.add(user)
             db.session.commit()
@@ -74,7 +74,7 @@ def login():
         else:
             session["uuid"] = check_user[0].uuid
             session["name"] = check_user[0].name
-            
+
         return redirect(url_for("home"))
     return render_template('login.html', title='Add user', form=form)
 
@@ -82,7 +82,7 @@ def login():
 @app.route("/logout", methods=['GET', 'POST'])
 def logout():
     session.clear()
-    return redirect(url_for("login"))    
+    return redirect(url_for("about"))    
 
 @app.route("/add", methods=['GET', 'POST'])
 def add():
@@ -100,7 +100,7 @@ def add():
                     )
         db.session.add(item)
         db.session.commit()
-        # flash(f'{form.item_name.data} added!', 'success')
+        flash(f'{form.item_name.data} added!', 'success')
         return redirect(url_for('home')) # if so - send to home page
     return render_template('add.html', title='Add Item', form=form)
 
