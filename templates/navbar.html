@@ -1,0 +1,32 @@
+<nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+    <div class="container">
+        <!-- <img class = "logo" src = "/static/image/log.png"> -->
+        <a class="navbar-brand mr-4" href="/"><img class="logo" src="/static/image/log.png">REMINDISH</a>
+        <!-- <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button> -->
+        <div class="navbar">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</li>
+                <li><a href="/show">Check Items</a></li>
+                <li>
+                    {% if session.uuid %}
+                    <a href="/logout">{{session.name}} | Logout</a>
+                    {% else %}
+                    <a href="/login">Sign In/Up</a>
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+        <!-- <div class="collapse navbar-collapse" id="navbarToggle">
+        <div class="navbar-nav mr-auto">
+          <a class="nav-item nav-link" href="/">Home</a>
+          <a class="nav-item nav-link" href="/about">About</a>
+          <!-- <a class = "nav-item nav-link red " href ="/register" ><img src = "/static/css/bag.jpg" alt=" Check Items " width="30" height="20"></a> -->
+        <!-- <a class = "nav-item nav-link " href ="/show" >Check Items</a> -->
+
+    </div>
+    </div>
+    </div>
+</nav>

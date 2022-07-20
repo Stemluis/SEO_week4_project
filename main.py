@@ -1,8 +1,8 @@
-from flask import Flask, render_template, url_for, flash, redirect, make_response, request
+from flask import Flask, render_template, url_for, flash, redirect, make_response, request, session
 from forms import AddUser, AddItemForm
 from flask_behind_proxy import FlaskBehindProxy
 from flask_sqlalchemy import SQLAlchemy
-#from flask_bcrypt import generate_password_hash as idHash 
+from flask_bcrypt import generate_password_hash as idHash 
 
 app = Flask(__name__)
 proxied = FlaskBehindProxy(app)  ## add this line
@@ -38,25 +38,27 @@ db.create_all()
 @app.route("/")
 @app.route("/home")
 def home():
-    user_uuid = request.cookies.get('uuid')
-    if user_uuid == None:
-        return redirect(url_for('new'))
+    if not session.get("uuid"):
+        return redirect(url_for('login'))
     else:
         return render_template('home.html', subtitle='Home')
+
+
 @app.route("/show")
 def show():
-    user_uuid = request.cookies.get('uuid')
-    # flash(f'{user_uuid}', 'success')
-    if user_uuid == None:
+    if not session.get("uuid"):
         return render_template('show.html', subtitle='Items', food_items=food_item.query.all())
     else:
-        return render_template('show.html', subtitle='Items', food_items=food_item.query.filter_by(uuid=user_uuid))
+        return render_template('show.html', subtitle='Items', food_items=food_item.query.filter_by(uuid=session.get("uuid")))
 
-@app.route("/new", methods=['GET', 'POST'])
-def new():
+
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    if session.get("uuid"):
+        return redirect(url_for("home"))
+
     form = AddUser()
     if form.validate_on_submit(): # checks if entries are valid
-        resp = make_response(render_template('home.html', title="Home"))
         check_user = User.query.filter_by(phone_number=form.phone_number.data)
 
         if check_user.count() == 0:
@@ -67,24 +69,30 @@ def new():
                     )
             db.session.add(user)
             db.session.commit()
-            resp.set_cookie('uuid', user.uuid)
+            session["uuid"] = user.uuid
+            session["name"] = user.name
         else:
-            resp.set_cookie('uuid', check_user[0].uuid)
-        # flash(f'{form.name.data} added!', 'success')
-        return resp
-    return render_template('new.html', title='Add user', form=form)
+            session["uuid"] = check_user[0].uuid
+            session["name"] = check_user[0].name
+            
+        return redirect(url_for("home"))
+    return render_template('login.html', title='Add user', form=form)
+
+
+@app.route("/logout", methods=['GET', 'POST'])
+def logout():
+    session.clear()
+    return redirect(url_for("login"))    
 
 @app.route("/add", methods=['GET', 'POST'])
 def add():
-    user_uuid = request.cookies.get('uuid')
-
-    if user_uuid == None or user_uuid == "":
-        return redirect(url_for('new'))
+    if not session.get("uuid"):
+        return redirect(url_for('login'))
 
     form = AddItemForm()
     if form.validate_on_submit(): # checks if entries are valid
         item = food_item(
-                        uuid = user_uuid,
+                        uuid = session.get("uuid"),
                         purchase_date=form.purchase_date.data,
                         expiration_date=form.expiration_date.data,
                         item_name=form.item_name.data,
