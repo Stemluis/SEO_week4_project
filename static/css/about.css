@@ -1,0 +1,9 @@
+marquee{
+    color:darkgreen;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.pics{
+  height: 50%;
+}

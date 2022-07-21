@@ -1,27 +1,9 @@
-table{
-    width: 80%;
-    margin: 10px auto;
-    padding: 10px;
-    border: 1px ;
-    border-radius: 10px;
-    text-align: center;
-    background-color: #70D242;
-}
-
-th{
-    height: 30px;
-}
-
-
 body {
   background: #fafafa;
   color: #333333;
   margin-top: 5rem;
 }
 
-.sub{
-  text-align: center;
-}
 h1, h2, h3, h4, h5, h6 {
   color: darkgreen;
 }
@@ -67,30 +49,19 @@ h1, h2, h3, h4, h5, h6 {
     color: darkgreen;
 }
 
-p{
-    text-align: center;
-    font-weight: 500;
-    font-size: xx-large;
-    text-transform: uppercase;
-    color:darkgreen;
-}
-button:hover{
-    color: #70D242;
-}
-
 .content-section {
   background: #ffffff;
   padding: 10px 20px;
   border: 1px solid #dddddd;
   border-radius: 3px;
-  margin-bottom: 20px;
+  margin: 40px;
 }
-.article-title {
+/* .article-title {
   color: #444444;
 }
 
 a.article-title:hover {
-  color: #428bca;
+  color: darkgreen;
   text-decoration: none;
 }
 
@@ -100,13 +71,13 @@ a.article-title:hover {
 .sign{
   text-align: center;
   font-weight: bold;
-  color: #428bca;
+  color: darkgreen;
 }
 .sign:hover{
-  color:#428bca;
-}
+  color:darkgreen;
+} */
 
-.article-img {
+/* .article-img {
   height: 65px;
   width: 65px;
   margin-right: 16px;
@@ -115,11 +86,11 @@ a.article-title:hover {
 .article-metadata {
   padding-bottom: 1px;
   margin-bottom: 4px;
-  border-bottom: 1px solid #e3e3e3
+  border-bottom: 1px solid darkgreen;
 }
 
 .article-metadata a:hover {
-  color: #333;
+  color: darkgreen;
   text-decoration: none;
 }
 
@@ -134,7 +105,7 @@ a.article-title:hover {
   width: 125px;
   margin-right: 20px;
   margin-bottom: 16px;
-}
+} */
 
 .account-heading {
   font-size: 2.5rem;
@@ -149,29 +120,3 @@ img {
     height: auto;
 }
 
-.image {
-  margin: 0px 30px;
-  margin-bottom:30px;
-  border : 3px solid;
-  border-top-color :  lightgreen;
-  border-right-color : lightgreen;
-  border-bottom-color : darkgreen;
-  border-left-color: darkgreen;
-  width: 100px;
-  height: 150px;
-  
-}
-.card {
-	  float: left;
-      margin: 20px;
-      margin-left: 40px;
-	}
-
-.card div{
-    text-align: center;
-    color: darkgreen;
-}
-
-.card div:hover{
-    color:lightgreen;
-}
