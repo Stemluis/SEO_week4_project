@@ -7,3 +7,61 @@ marquee{
 .pics{
   height: 50%;
 }
+
+.column {
+  float: left;
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 0 8px;
+}
+.cardd {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  margin: 8px;
+}
+.about{
+    color: white;
+    text-decoration: underline;
+}
+.about-section {
+  padding: 20px;
+  text-align: center;
+  background-color: green;
+  text-transform: uppercase;
+}
+.about-section p{
+    color: white;
+    text-transform: initial;
+}
+.column p{
+    text-transform: initial;
+}
+.title {
+  color: black;
+}
+.mission{
+  text-align: center;
+  text-transform: uppercase;
+  text-decoration: underline;
+  padding: 20px;
+}
+.Do{
+  color: white;
+  text-decoration: underline;
+}
+.button {
+  border: none;
+  outline: 0;
+  padding: 0px;
+  color: white;
+  background-color: green;
+  text-align: center;
+  cursor: pointer;
+  width: 100%; 
+}
+.button:hover {
+  background-color: #555;
+}
+.column h2{
+    text-decoration: underline;
+    text-align: center;
+}
