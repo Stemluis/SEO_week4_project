@@ -5,7 +5,7 @@ table{
     border: 1px ;
     border-radius: 10px;
     text-align: center;
-    background-color: #70D242;
+    /* background-color: #70D242; */
 }
 th{
     height: 30px;
