@@ -4,7 +4,11 @@ from flask_behind_proxy import FlaskBehindProxy
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import generate_password_hash as idHash 
 from data_table import *
+from ics import Calendar, Event
 import re
+import json
+import datetime
+
 
 app = Flask(__name__)
 proxied = FlaskBehindProxy(app)  ## add this line
@@ -30,8 +34,8 @@ class food_item(db.Model):
             'id':self.id,
             'item_name': self.item_name,
             'item_category': self.item_category,
-            'purchase_date': self.purchase_date.strftime("%A - %m/%d/%Y"),
-            'expiration_date': self.expiration_date.strftime("%A - %m/%d/%Y"),
+            'purchase_date': self.purchase_date.strftime("%m/%d/%Y"),
+            'expiration_date': self.expiration_date.strftime("%m/%d/%Y"),
         }
 
 class User(db.Model):
@@ -42,7 +46,7 @@ class User(db.Model):
     phone_number = db.Column(db.String(15), nullable=False)
 
     def __repr__(self):
-        return f"Food({self.name}, {self.phone_number})"
+        return f"User({self.name}, {self.phone_number})"
 
 db.create_all()
 
@@ -52,7 +56,12 @@ def home():
     if not session.get("uuid"):
         return redirect(url_for('about'))
     else:
-        return render_template('home.html', subtitle='Home')
+        if not session.get("announced"):
+            message = checkForExpired(food_item, User, session.get("uuid"))
+            session['announced'] = True
+            return render_template('home.html', subtitle='Home', message=message)
+        else:
+            return render_template('home.html', subtitle='Home', message="")
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -107,18 +116,18 @@ def add(category):
                     )
         db.session.add(item)
         db.session.commit()
-        flash(f'{form.item_name.data} added!', 'success')
+        # flash(f'{form.item_name.data} added!', 'success')
         return redirect(url_for('home')) # if so - send to home page
     return render_template('add.html', title='Add Item', form=form, category=category)
 
 
 @app.route("/show")
 def show():
-    # return render_template('show.html', subtitle="Test Table")
-    if not session.get("uuid"):
-        return render_template('show.html', subtitle='Items', food_items=food_item.query.all())
-    else:
-        return render_template('show.html', subtitle='Items', food_items=food_item.query.filter_by(uuid=session.get("uuid")))
+    # return render_template('test_test_table.html', subtitle="Test Table")
+    # if not session.get("uuid"):
+    #     return render_template('show.html', subtitle='Items', food_items=food_item.query.all(), today=datetime.datetime.now())
+    # else:
+    return render_template('show.html', subtitle='Items', food_items=food_item.query.filter_by(uuid=session.get("uuid")), today=datetime.datetime.now().date())
 
 
 @app.route('/api/data')
@@ -139,17 +148,25 @@ def remove(item_name):
 def update():
     uuid = session.get("uuid")
     data = request.json
-    print(data)
-    # new_item = {
-    #     "id": data["id"],
-    #     "item_name": data["item_name"],
-    #     "item_category": data["item_category"],
-    #     "purchase_date": data["purchase_date"],
-    #     "expiration_date": data["expiration_date"]
-    # }
-    # print(new_item)
-    # updateItem(db, food_item, uuid, [item_name])
+    # print(data)
+    new_item = {
+        "id": data["id"],
+        "item_name": data["item_name"],
+        "item_category": data["item_category"],
+        "purchase_date": data["purchase_date"],
+        "expiration_date": data["expiration_date"]
+    }
+    updateItem(db, food_item, uuid, [item_name])
     return redirect(url_for("show"))
+
+# @app.route('/export', methods=['POST', 'GET'])
+# def export():
+#     uuid = session.get("uuid")
+#     _calendar = createCalendar(uuid, datetime.datetime.now().date())
+#     response = make_response(open('calendar.ics'))
+#     response.headers["Content-Disposition"] = "attachment; filename=calendar.ics"
+#     return response
+    # return redirect(url_for("show"))
 
 @app.route("/about", methods=['GET'])
 def about():
@@ -160,6 +177,39 @@ def about():
 def support():
     return render_template('support.html', title='Support')
 
+def createCalendar(uuid, today):
+    cal = Calendar()
+
+    query = food_item.query.filter(food_item.expiration_date > today).all()
+    for item in query:
+        e = Event()
+        e.name = f'{item.item_name} expires'
+        e.begin = item.expiration_date.strftime("%Y-%m-%d %X")
+        cal.events.add(e)
+
+    with open('calendar.ics', 'w') as f:
+        f.writelines(cal.serialize_iter())
+
+    return cal
+
+
+def createFakeData():
+    try:
+        file = open('MOCK_DATA.json')
+    except Exception as e:
+        print("File not found")
+    
+    data = json.load(file)
+    for item in data:
+        newItem = food_item(
+            uuid = item['uuid'],
+            purchase_date=datetime.strptime(item['purchase_date'], '%Y/%m/%d'),
+            expiration_date=datetime.strptime(item['expiration_date'], '%Y/%m/%d'),
+            item_name=item['item_name'],
+            item_category=item['item_category']
+        )
+        db.session.add(newItem)
+        db.session.commit()
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0")

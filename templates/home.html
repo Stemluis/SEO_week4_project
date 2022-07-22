@@ -57,4 +57,12 @@
     </a>
 </div> -->
 
+{% if message %}
+    <script>
+        var message = `{{message | safe}}`;
+        if(message && message != "")
+            alert(message)
+    </script>
+{% endif %}
+
 {% endblock content %}

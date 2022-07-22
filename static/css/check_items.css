@@ -5,8 +5,22 @@ table{
     border: 1px ;
     border-radius: 10px;
     text-align: center;
-    background-color: #70D242;
+    background-color: #ffffff;
 }
 th{
     height: 30px;
+}
+
+.tableActions{
+    display: flex;
+    flex-direction: row;
+    margin: auto;
+    align-self: center;
+    justify-content: center;
+}
+
+.tableActions button{
+    height: auto;
+    width: 5%;
+    margin-left: 10px;
 }

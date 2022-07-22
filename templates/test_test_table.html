@@ -1,18 +1,24 @@
 {% extends "layout.html" %} {% block content %}
 <header>
-    <link rel="stylesheet" href="https://cdn.datatables.net/datetime/1.1.2/css/dataTables.dateTime.min.css">
-    <link rel="stylesheet" href="https://editor.datatables.net/extensions/Editor/css/editor.dataTables.min.css">
+    <link rel="stylesheet" type="text/css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.8/css/dataTables.bootstrap.css" />
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.datatables.net/keytable/2.7.0/css/keyTable.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.dataTables.min.css" />
+
+    <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css"
+        rel="stylesheet" type="text/css" />
 </header>
 
-<table id="example" class="display" cellspacing="0" width="100%">
+<table id="table" class="table table-striped" style="width:90%">
     <thead>
         <tr>
             <th>Item Name</th>
             <th>Item Category</th>
             <th>Purchase Date</th>
             <th>Expiration Date</th>
-            <th></th>
-            <th></th>
         </tr>
     </thead>
 </table>
@@ -20,88 +26,122 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-    var editor; // use a global for the submit and return data rendering in the examples
-    $(document).ready(function () {
-        editor = new $.fn.dataTable.Editor({
-            "ajax": '/api/data',
-            "table": "#table",
-            "fields": [{
-                "label": "Item Name:",
-                "name": "item_name"
-            }, {
-                "label": "Item Category:",
-                "name": "last_name"
-            }, {
-                "label": "Purchase Date:",
-                "name": "purchase_date"
-            }, {
-                "label": "Expiration Date:",
-                "name": "expiration_date"
-            }]
-        });
+<!-- <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.js"></script> -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.js">
+</script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.8/js/dataTables.bootstrap.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/autofill/2.0.0/js/dataTables.autoFill.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/autofill/2.0.0/js/autoFill.bootstrap.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/keytable/2.0.0/js/dataTables.keyTable.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/responsive/1.0.7/js/dataTables.responsive.js"></script>
 
-        // New record
-        $('a.editor-create').on('click', function (e) {
-            e.preventDefault();
-
-            editor.create({
-                title: 'Create new record',
-                buttons: 'Add'
-            });
-        });
-
-        // Edit record
-        $('#table').on('click', 'td.editor-edit', function (e) {
-            e.preventDefault();
-
-            editor.edit($(this).closest('tr'), {
-                title: 'Edit record',
-                buttons: 'Update'
-            });
-        });
-
-        // Delete a record
-        $('#table').on('click', 'td.editor-delete', function (e) {
-            e.preventDefault();
-
-            editor.remove($(this).closest('tr'), {
-                title: 'Delete record',
-                message: 'Are you sure you wish to remove this record?',
-                buttons: 'Delete'
-            });
-        });
-
-        $('#table').DataTable({
-            ajax: '/api/data',
-            columns: [ {
-                    data: "item_name"
-                },
-                {
-                    data: "item_category"
-                },
-                {
-                    data: "purchase_date"
-                },
-                {
-                    data: "expiration_date"
-                },
-                {
-                    data: null,
-                    className: "dt-center editor-edit",
-                    defaultContent: '<i class="fa fa-pencil"/>',
-                    orderable: false
-                },
-                {
-                    data: null,
-                    className: "dt-center editor-delete",
-                    defaultContent: '<i class="fa fa-trash"/>',
-                    orderable: false
-                }
-            ]
-        });
-    });
+<script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js">
 </script>
 
+<script>
+    $(document).ready(function () {
+        var datatable = $('#table').dataTable({
+            "ajax": '/api/data',
+            // "serverSide": true,
+            "responsive": true,
+            "columns": [{
+                    data: 'item_name',
+                    orderable: true,
+                    searchable: true,
+                    className: "editable"
+                },
+                {
+                    data: 'item_category',
+                    orderable: true,
+                    searchable: false,
+                },
+                {
+                    data: 'purchase_date',
+                    orderable: true,
+                    searchable: false,
+                    className: "editable"
+                },
+                {
+                    data: 'expiration_date',
+                    orderable: true,
+                    searchable: false,
+                    className: "editable"
+                }
+            ],
+            "bPaginate": true,
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                $('th').removeClass("editable");
+                var setCell = function (response, newValue) {
+                    var table = new $.fn.dataTable.Api('#table');
+                    var cell = table.cell('td.focus');
+                    var cellData = cell.data();
+
+                    var div = document.createElement('div');
+                    div.innerHTML = cellData;
+                    var a = div.childNodes;
+                    a.innerHTML = newValue;
+
+                    console.log('jml a new ' + div.innerHTML);
+                    cell.data(div.innerHTML);
+                    highlightCell($(cell.node()));
+                    console.log("Change")
+
+                    // This is huge cheese, but the a has lost it's editable nature.  Do it again.
+                    $('td.focus a').editable({
+                        'mode': 'inline',
+                        'success': setCell
+                    });
+                };
+                $('.editable').editable({
+                    'mode': 'inline',
+                    'success': setCell
+                });
+            },
+            "keys": true
+        });
+
+        addCellChangeHandler();
+        // addAutoFillHandler();
+
+        function highlightCell($cell) {
+            var originalValue = $cell.attr('data-original-value');
+            if (!originalValue) {
+                return;
+            }
+            var actualValue = $cell.text();
+            if (!isNaN(originalValue)) {
+                originalValue = parseFloat(originalValue);
+            }
+            if (!isNaN(actualValue)) {
+                actualValue = parseFloat(actualValue);
+            }
+            if (originalValue === actualValue) {
+                $cell.removeClass('cat-cell-modified').addClass('cat-cell-original');
+            } else {
+                $cell.removeClass('cat-cell-original').addClass('cat-cell-modified');
+            }
+        }
+
+        function addCellChangeHandler() {
+            $('a[data-pk]').on('hidden', function (e, editable) {
+                var $a = $(this);
+                var $cell = $a.parent('td');
+                highlightCell($cell);
+            });
+        }
+
+        // function addAutoFillHandler() {
+        //     var table = $('#table').DataTable();
+        //     table.on('autoFill', function (e, datatable, cells) {
+        //         var datatableCellApis = $.each(cells, function (index, row) {
+        //             var datatableCellApi = row[0].cell;
+        //             var $jQueryObject = $(datatableCellApi.node());
+        //             highlightCell($jQueryObject);
+        //         });
+        //     });
+        // }
+    })
+</script>
 
 {% endblock%}

@@ -71,3 +71,6 @@ Werkzeug==2.0.1
 wsproto==1.0.0
 WTForms==3.0.0
 zipp==3.4.1
+arrow==1.2.2
+ics==0.7.2
+tatsu==4.4.0

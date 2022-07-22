@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% block content %} 
+{% block content %}
 <div class="content-section">
     <table>
         <thead>
@@ -11,15 +11,37 @@
             </tr>
         </thead>
         <tbody>
-            {% for item in food_items %} 
-            <tr>
-                <td>{{ item.item_name }}</td>
-                <td>{{ item.item_category }}</td>
-                <td>{{ item.purchase_date }}</td>
-                <td>{{ item.expiration_date }}</td>
-            </tr> 
-            {% endfor %} 
+            {% for item in food_items %}
+            {% if item.expiration_date < today %}
+            <tr style="background-color: rgb(252, 129, 129);">
+                {% elif ((item.expiration_date - today).days) < 2 %}
+            <tr style="background-color: rgb(255, 188, 100);"></tr>
+            {% else %}
+            <tr></tr>
+            {% endif %}
+            <td>{{ item.item_name }}</td>
+            <td>{{ item.item_category }}</td>
+            <td>{{ item.purchase_date }}</td>
+            <td>{{ item.expiration_date }}</td>
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
-</div> 
+    <div class='tableActions'>
+        <input id="removeName" type="text" placeholder="Enter item to remove...">
+        <button type="submit" onclick="remove()">Remove</button>
+        <!-- <a href="/export"><button>Export Calendar</button></a> -->
+    </div>
+</div>
+
+<script>
+    function remove() {
+        var name = document.getElementById("removeName").value
+        console.log(name)
+        $.ajax({
+            url: '/api/remove/' + name,
+            type: 'POST'
+        })
+    }
+</script>
 {% endblock content %}

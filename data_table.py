@@ -1,4 +1,6 @@
 from flask import request
+from datetime import *
+from sms import *
 
 def filterTable(food_item, uuid):
     query = food_item.query.filter_by(uuid=uuid)
@@ -10,6 +12,7 @@ def filterTable(food_item, uuid):
     total_filtered = query.count()
 
     return (query, total_filtered)
+
 
 def sortQuery(food_item, query):
     order = []
@@ -36,6 +39,7 @@ def sortQuery(food_item, query):
     query = query.offset(start).limit(length)
 
     return query
+
 
 def queryResponse(food_item, uuid, query, total_filtered):
     return {
@@ -65,3 +69,21 @@ def updateItem(db, model, uuid, items):
         removeItem(db, model, uuid, [old_item.item_name])
         db.session.add(new_item)
     db.session.commit()
+
+
+def checkForExpired(food_item, User, user_uuid):
+    today = datetime.now()
+    query = food_item.query.filter(food_item.expiration_date < today).all()
+    if len(query) > 0:
+        message = ""
+        for item in query:
+            message += f'{item.item_name} expired {item.expiration_date}\n'
+        
+        number = User.query.filter_by(uuid=user_uuid).first().phone_number
+        if False:
+            sendMessage(number, message)
+        return message
+    else:
+        return None
+
+

@@ -14,6 +14,10 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- <script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.bootstrap5.min.js"></script> -->
 <script>
     $(document).ready(function () {
         let table = $('#data').DataTable({
@@ -56,10 +60,7 @@
                 "<'row'<'col-sm-12 col-md-8'i><'col-sm-12 col-md-2'l><'col-sm-12 col-md-2'p>>",
             buttons: [{
                     text: 'Remove',
-                    className: 'removeButton',
-                    action: function (e, dt, node, config) {
-                        remove();
-                    }
+                    className: 'removeButton'
                 },
                 {
                     text: 'Edit',
@@ -68,106 +69,177 @@
             ]
         });
 
-        // $('#data tbody').on('click', 'tr', function () {
-        //     if ($(this).hasClass('selected')) {
-        //         $(".removeButton").css("background-color", "grey")
-        //     } else {
-        //         $(".removeButton").css("background-color", "red")
-        //     }
-        // });
 
-        // function remove() {
-        //     var name = table.row('.selected').data().item_name
-        //     table.row('.selected').remove().draw(false);
-        //     $.ajax({
-        //         url: '/api/remove/' + name,
-        //         type: 'POST'
-        //     })
-        //     $.ajax.reload()
-        // }
+        function remove() {
+            var name = table.row('.selected').data().item_name
+            table.row('.selected').remove().draw(false);
+            $.ajax({
+                url: '/api/remove/' + name,
+                type: 'POST'
+            })
+            table.draw()
+        }
 
-        // function getRowData() {
-        //     return table.row('.selected').data();
-        // }
+        function update(){
+            var modRow = table.row('.selected').data()
+            var rowDict = {
+                id: modRow.id,
+                item_name: modRow.item_name,
+                item_category: modRow.item_category,
+                purchase_date: modRow.purchase_date,
+                expiration_date: modRow.expiration_date,
+            }
+            $.ajax({
+                url: '/api/update',
+                type: 'POST',
+                contentType: "application/json",
+                data: JSON.stringify(rowDict)
+            })
+            table.draw()
+        }
 
-        // function convertDate(full_date) {
-        //     let date = new Date(full_date)
-        //     return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
-        // }
+        function getRowData() {
+            return table.row('.selected').data();
+        }
 
+        function convertExistingDate(full_date) {
+            let date = new Date(full_date)
+            return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
+        }
+
+        function convertInputDate(date) {
+            let d = new Date(date)
+            return `${(d.getMonth() + 1).toString().padStart(2, "0")}-${d.getDate().toString().padStart(2, "0")}-${d.getFullYear()}`;
+        }
+
+        function convertInvalid(input) {
+            let result = input.replace('/', '_');
+            result = result.replace(' ', '-');
+            return result;
+        }
+
+        function convertCorrect(input) {
+            let result = input.replace('_', '/');
+            result = result.replace('-', ' ');
+            return result;
+        }
+
+        var editting = false;
+        var selectedRow = null;
+        var selectedNode = null;
+
+        // $('body').on('click', function (e) {
+        //     selectedRow = table.row('.selected').index();
+        // })
+
+        $(".editButton").on('click', function (e) {
+            if (selectedRow != null) {
+                if ($(this).text() == "Save") {
+
+                    $(this).text("Edit");
+                    editting = false;
+                } else {
+                    $(this).text("Save");
+                    editting = true;
+                }
+            }
+        })
+
+        $(".removeButton").on('click', function (e) {
+            if (selectedRow != null) {
+                remove();
+            }
+        })
+
+        $('#data tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+                $(".removeButton").css("background-color", "grey")
+                $('.editButton').css("background-color", "grey")
+            } else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+                $(".removeButton").css("background-color", "IndianRed")
+                $('.editButton').css("background-color", "DodgerBlue")
+            }
+            selectedRow = table.row('.selected').index()
+        });
 
         $('#data').on('mouseenter', 'td.editable', function (e) {
             e.preventDefault()
-            if (e.target.localName != 'input') {
+            if (e.target.localName != 'input' && e.target.localName != 'selection') {
                 let row = e.target._DT_CellIndex.row
                 let col = e.target._DT_CellIndex.column
                 let inputType = e.target.className.split("e ")[1]
-                if (!e.target.children.length) {
-                    e.target.innerHTML =
-                        `<input id="${row}-${col}" type="${inputType}" class="editor" value="${e.target.innerHTML}">`
+                if (!e.target.children.length && editting && row == selectedRow) {
+                    if (inputType == "text")
+                        e.target.innerHTML =
+                        `<input id="${row}-${col}" type="${inputType}" class="editor text" value="${e.target.innerHTML}">`
+                    else if (inputType == "selection") {
+                        let selected = convertInvalid(e.target.innerHTML);
+                        e.target.innerHTML =
+                            `<select class="category_selection selection" name="category" id="${row}-${col}">
+                                <option value="Grocery">Grocery</option>
+                                <option value="Fruits">Fruits</option>
+                                <option value="Vegetables">Vegetables</option>
+                                <option value="Canned-Goods">Canned Goods</option>
+                                <option value="Dairy">Dairy</option>
+                                <option value="Meat">Meat</option>
+                                <option value="Seafood">Seafood</option>
+                                <option value="Deli">Deli</option>
+                                <option value="Condiments_Spices">Condiments/Spices</option>
+                                <option value="Snacks">Snacks</option>
+                                <option value="Bread_Baked-Goods">Bread/Baked Goods</option>
+                                <option value="Beverages">Beverages</option>
+                                <option value="Pasta_Rice_Cereal">Pasta/Rice/Cereal</option>
+                                <option value="Baking">Baking</option>
+                                <option value="Frozen-Foods">Frozen Foods</option>
+                            </select>`
+
+                        $(".category_selection").val(selected).change();
+                    } else
+                        e.target.innerHTML =
+                        `<input id="${row}-${col}" type="${inputType}" class="editor date" value="${convertExistingDate(e.target.innerHTML)}">`
+                    $(e.target.parentNode).addClass('selected')
                 }
             }
         })
 
         // when the mouse exits the editor, write the data into the table and redraw
         $('#data').on('mouseleave', 'td.editable', function (e) {
+            // console.log(table.row('.selected').index())
             e.preventDefault()
-            if (e.target.localName != 'input') {
-                let row = e.target._DT_CellIndex.row
-                let col = e.target._DT_CellIndex.column
-                table.cell(row, col).data(e.target.firstElementChild.value)
-                table.draw() // up to you
-            } else { // forces write when there is an event delay
-                let [row, col] = e.target.id.split('-')
-                table.cell(Number(row), Number(col)).data(e.target.value)
-            }
-            table.draw()
-        })
+            if (editting) {
+                if (e.target.localName != 'input' && e.target.localName != 'selection' && e.target != null) {
+                    let rol, col;
+                    try {
+                        row = e.target._DT_CellIndex.row
+                        col = e.target._DT_CellIndex.column
+                    } catch (error) {
+                        return   
+                    }
 
-        // let old;
-        // $(".editButton").on('click', function (e) {
-        //     if ($(this).text() == "Save") {
-        //         data = getRowData()
-        //         console.log(data['item_name'].value)
-        //         $.ajax({
-        //             type: "POST",
-        //             url: "/api/update",
-        //             data: JSON.stringify(data),
-        //             contentType: 'application/json;charset=UTF-8',
-        //             success: function (result) {
-        //                 // console.log(result);
-        //             }
-        //         })
-        //         $(this).text("Edit");
-        //     } else {
-        //         old = getRowData();
-        //         table.row('.selected').data({
-        //             expiration_date: `<input type='date' value=${convertDate(old.expiration_date)}>`,
-        //             id:table.row('.selected').data().id,
-        //             item_category: 
-        //                 `<select name="category" id="category_select" selected="${old.item_category}"'>
-        //                     <option value="Grocery">Grocery</option>
-        //                     <option value="Fruits">Fruits</option>
-        //                     <option value="Vegetables">Vegetables</option>
-        //                     <option value="Canned Goods">Canned Goods</option>
-        //                     <option value="Dairy">Dairy</option>
-        //                     <option value="Meat">Meat</option>
-        //                     <option value="Seafood">Seafood</option>
-        //                     <option value="Deli">Deli</option>
-        //                     <option value="Condiments/Spices">Condiments/Spices</option>
-        //                     <option value="Snacks">Snacks</option>
-        //                     <option value="Bread/Baked Goods">Bread/Baked Goods</option>
-        //                     <option value="Beverages">Beverages</option>
-        //                     <option value="Pasta/Rice/Cereal">Pasta/Rice/Cereal</option>
-        //                     <option value="Baking">Baking</option>
-        //                     <option value="Frozen Foods">Frozen Foods</option>
-        //                 </select>`,
-        //             item_name: `<input type='text' value=${old.item_name}>`,
-        //             purchase_date: `<input type='date' value=${convertDate(old.purchase_date)}>`,
-        //         })
-        //     }
-        //     $(this).text("Save");
-        // });
+                    if(row != selectedRow){
+                        return
+                    }
+                        
+
+                    let inputType = e.target.className.split(" ").slice(-1)
+
+                    if (inputType == "date")
+                        table.cell(row, col).data(convertInputDate(e.target.firstElementChild.value))
+                    else if (inputType == "selection"){
+                        table.cell(row, col).data(convertCorrect(e.target.firstElementChild.value))
+                    }else
+                        table.cell(row, col).data(e.target.firstElementChild.value)
+                    
+                    update();
+                    
+                    $(e.target.parentNode).addClass('selected')
+                    table.draw() // up to you
+                }
+            }
+        })
     });
-</script>
+<!-- </script> -->
 {% endblock%}

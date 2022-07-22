@@ -32,12 +32,13 @@ class AddUser(FlaskForm):
                             validators=[DataRequired()])
     submit = SubmitField("Add user")
 
-    def validate_phone(form, field):
+    def validate_phone_number(form, field):
         try:
             if not ph.is_valid_number(ph.parse(field.data, 'IN')):
                 raise ValidationError("Please enter a valid phone number")
         except Exception as e:
             raise ValidationError("Please enter a valid phone number")
+        
 
 class AddItemForm(FlaskForm):
     item_name = StringField('Item name',
