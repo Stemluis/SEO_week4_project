@@ -8,10 +8,14 @@ def sendMessage(number, message):
     """Sends an SMS message containing food about to expire"""
     client = Client(account_sid, auth_token)
 
-    message = client.messages.create(
-        to = f"{number}",
-        from_ = "+15087383072",
-        body = message
-    )
+    try:
+        message = client.messages.create(
+            to = f"{number}",
+            from_ = "+15087383072",
+            body = message
+        )
+        
+        print(message.sid)
+    catch Exception as e:
+        print("Twilio verified numbers only")
     
-    print(message.sid)
