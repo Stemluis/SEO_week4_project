@@ -7,7 +7,7 @@ from data_table import *
 from ics import Calendar, Event
 import re
 import json
-import datetime
+from datetime import *
 
 
 app = Flask(__name__)
@@ -127,7 +127,7 @@ def show():
     # if not session.get("uuid"):
     #     return render_template('show.html', subtitle='Items', food_items=food_item.query.all(), today=datetime.datetime.now())
     # else:
-    return render_template('show.html', subtitle='Items', food_items=food_item.query.filter_by(uuid=session.get("uuid")), today=datetime.datetime.now().date())
+    return render_template('show.html', subtitle='Items', food_items=food_item.query.filter_by(uuid=session.get("uuid")), today=datetime.now().date())
 
 
 @app.route('/api/data')
@@ -159,13 +159,14 @@ def update():
     updateItem(db, food_item, uuid, [item_name])
     return redirect(url_for("show"))
 
-# @app.route('/export', methods=['POST', 'GET'])
-# def export():
-#     uuid = session.get("uuid")
-#     _calendar = createCalendar(uuid, datetime.datetime.now().date())
-#     response = make_response(open('calendar.ics'))
-#     response.headers["Content-Disposition"] = "attachment; filename=calendar.ics"
-#     return response
+@app.route('/export', methods=['POST', 'GET'])
+def export():
+    uuid = session.get("uuid")
+    _calendar = createCalendar(uuid, datetime.now().date())
+    data = open('calendar.ics', 'r').read()
+    response = make_response(data)
+    response.headers["Content-Disposition"] = "attachment; filename=calendar.ics"
+    return response
     # return redirect(url_for("show"))
 
 @app.route("/about", methods=['GET'])

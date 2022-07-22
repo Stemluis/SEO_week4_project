@@ -80,7 +80,7 @@ def checkForExpired(food_item, User, user_uuid):
             message += f'{item.item_name} expired {item.expiration_date}\n'
         
         number = User.query.filter_by(uuid=user_uuid).first().phone_number
-        if False:
+        if True:
             sendMessage(number, message)
         return message
     else:

@@ -1,7 +1,7 @@
 from twilio.rest import Client
 
 account_sid = "AC4cc08179533042f69e03ae5520dd96df"
-auth_token  = "8582ec59b682cfb80fa8149f183a0a00"
+auth_token  = "49a8279d546bfd73b7ef09fa9b447e97"
 
 def sendMessage(number, message):
     """Sends an SMS message containing food about to expire"""
