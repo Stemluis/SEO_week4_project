@@ -114,11 +114,11 @@ def add(category):
 
 @app.route("/show")
 def show():
-    return render_template('show.html', subtitle="Test Table")
-    # if not session.get("uuid"):
-    #     return render_template('show.html', subtitle='Items', food_items=food_item.query.all())
-    # else:
-    #     return render_template('show.html', subtitle='Items', food_items=food_item.query.filter_by(uuid=session.get("uuid")))
+    # return render_template('show.html', subtitle="Test Table")
+    if not session.get("uuid"):
+        return render_template('show.html', subtitle='Items', food_items=food_item.query.all())
+    else:
+        return render_template('show.html', subtitle='Items', food_items=food_item.query.filter_by(uuid=session.get("uuid")))
 
 
 @app.route('/api/data')
