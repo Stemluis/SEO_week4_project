@@ -16,6 +16,6 @@ def sendMessage(number, message):
         )
         
         print(message.sid)
-    catch Exception as e:
+    except Exception as e:
         print("Twilio verified numbers only")
     
