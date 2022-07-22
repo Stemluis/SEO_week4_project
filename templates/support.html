@@ -1,50 +1,48 @@
-{% extends "layout.html" %} 
+{% extends "layout.html" %}
 {% block content %}
 <html>
+
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-<body>
 
 <h2>FAQs</h2>
 <button type="button" class="collapsible">How to use</button>
 <div class="content">
-  <p>Input name and phone number to take you to the homepage, select category or choose others if category not found. 
-      Enter name of items and date to store items.
-  </p>
+	<p>Input name and phone number to take you to the homepage, select category or choose others if category not
+		found.
+		Enter name of items and date to store items.
+	</p>
 </div>
 
 <button type="button" class="collapsible">What to do</button>
 <div class="content">
-  <p>You can check items, add or remove from item</p>
+	<p>You can check items, add or remove from item</p>
 </div>
 <button type="button" class="collapsible">How to remove</button>
 <div class="content">
-  <p>Select item to be removed and click on the remove button</p>
+	<p>Select item to be removed and click on the remove button</p>
 </div>
 <button type="button" class="collapsible">How to get an sms</button>
 <div class="content">
-  <p>It must be a valid number entered by user and it's eligible to get sms</p>
+	<p>It must be a valid number entered by user and it's eligible to get sms</p>
 </div>
 
 <script>
-var coll = document.getElementsByClassName("collapsible");
-var i;
+	var coll = document.getElementsByClassName("collapsible");
+	var i;
 
-for (i = 0; i < coll.length; i++) {
-  coll[i].addEventListener("click", function() {
-    this.classList.toggle("active");
-    var content = this.nextElementSibling;
-    if (content.style.display === "block") {
-      content.style.display = "none";
-    } else {
-      content.style.display = "block";
-    }
-  });
-}
+	for (i = 0; i < coll.length; i++) {
+		coll[i].addEventListener("click", function () {
+			this.classList.toggle("active");
+			var content = this.nextElementSibling;
+			if (content.style.display === "block") {
+				content.style.display = "none";
+			} else {
+				content.style.display = "block";
+			}
+		});
+	}
 </script>
-
-</body>
-</html>
 
 {% endblock content %}

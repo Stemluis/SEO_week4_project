@@ -4,15 +4,16 @@ from flask_behind_proxy import FlaskBehindProxy
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import generate_password_hash as idHash 
 from data_table import *
+from config import SECRET_KEY
 from ics import Calendar, Event
+from datetime import *
 import re
 import json
-from datetime import *
 
 
 app = Flask(__name__)
 proxied = FlaskBehindProxy(app)  ## add this line
-app.config['SECRET_KEY'] = 'ea7c8cf166ec194d38b0cfd171d58bc0'
+app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)

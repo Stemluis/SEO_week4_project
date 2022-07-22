@@ -21,6 +21,6 @@ th{
 
 .tableActions button{
     height: auto;
-    width: 5%;
+    width: auto;
     margin-left: 10px;
 }
