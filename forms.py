@@ -7,21 +7,22 @@ from datetime import datetime
 today = datetime.now().date()
 
 choices = [
-            ("Grocery", "Grocery"),
-            ("Fruits", "Fruits"),
-            ("Vegetables", "Vegetables"),
-            ("Canned Goods", "Canned Goods"),
-            ("Dairy", "Dairy"),
-            ("Meat", "Meat"),
-            ("Seafood", "Seafood"),
-            ("Deli", "Deli"),
-            ("Condiments/Spices", "Condiments/Spices"),
-            ("Snacks", "Snacks"),
-            ("Bread/Baked Goods", "Bread/Baked Goods"),
-            ("Beverages", "Beverages"),
-            ("Pasta/Rice/Cereal", "Pasta/Rice/Cereal"),
-            ("Baking", "Baking"),
-            ("Frozen Foods", "Frozen Foods")
+            "Grocery",
+            "Fruits",
+            "Vegetables",
+            "Canned Goods",
+            "Dairy",
+            "Meat",
+            "Seafood",
+            "Deli",
+            "Condiments/Spices",
+            "Snacks",
+            "Bread/Baked Goods",
+            "Beverages",
+            "Pasta/Rice/Cereal",
+            "Baking",
+            "Frozen Foods",
+            "Other"
         ]
 
 class AddUser(FlaskForm):
@@ -41,8 +42,6 @@ class AddUser(FlaskForm):
 class AddItemForm(FlaskForm):
     item_name = StringField('Item name',
                            validators=[DataRequired(), Length(min=2, max=40)])
-    item_category = SelectField('Item Category', choices=choices,
-                        validators=[DataRequired()])
     purchase_date = DateField('Purchase Date', format='%Y-%m-%d',
                                     validators=[DataRequired()])
     expiration_date = DateField('Expiration Date', format='%Y-%m-%d',

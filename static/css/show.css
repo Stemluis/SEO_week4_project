@@ -10,6 +10,7 @@ table{
 
 th{
     height: 30px;
+    text-align: center!important;
 }
 
 
@@ -175,3 +176,7 @@ img {
 .card div:hover{
     color:lightgreen;
 }
+
+/* .removeButton:hover{
+    background-color: red;
+} */

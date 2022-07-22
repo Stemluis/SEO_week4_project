@@ -1,0 +1,107 @@
+{% extends "layout.html" %} {% block content %}
+<header>
+    <link rel="stylesheet" href="https://cdn.datatables.net/datetime/1.1.2/css/dataTables.dateTime.min.css">
+    <link rel="stylesheet" href="https://editor.datatables.net/extensions/Editor/css/editor.dataTables.min.css">
+</header>
+
+<table id="example" class="display" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>Item Name</th>
+            <th>Item Category</th>
+            <th>Purchase Date</th>
+            <th>Expiration Date</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+</table>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    var editor; // use a global for the submit and return data rendering in the examples
+    $(document).ready(function () {
+        editor = new $.fn.dataTable.Editor({
+            "ajax": '/api/data',
+            "table": "#table",
+            "fields": [{
+                "label": "Item Name:",
+                "name": "item_name"
+            }, {
+                "label": "Item Category:",
+                "name": "last_name"
+            }, {
+                "label": "Purchase Date:",
+                "name": "purchase_date"
+            }, {
+                "label": "Expiration Date:",
+                "name": "expiration_date"
+            }]
+        });
+
+        // New record
+        $('a.editor-create').on('click', function (e) {
+            e.preventDefault();
+
+            editor.create({
+                title: 'Create new record',
+                buttons: 'Add'
+            });
+        });
+
+        // Edit record
+        $('#table').on('click', 'td.editor-edit', function (e) {
+            e.preventDefault();
+
+            editor.edit($(this).closest('tr'), {
+                title: 'Edit record',
+                buttons: 'Update'
+            });
+        });
+
+        // Delete a record
+        $('#table').on('click', 'td.editor-delete', function (e) {
+            e.preventDefault();
+
+            editor.remove($(this).closest('tr'), {
+                title: 'Delete record',
+                message: 'Are you sure you wish to remove this record?',
+                buttons: 'Delete'
+            });
+        });
+
+        $('#table').DataTable({
+            ajax: '/api/data',
+            columns: [ {
+                    data: "item_name"
+                },
+                {
+                    data: "item_category"
+                },
+                {
+                    data: "purchase_date"
+                },
+                {
+                    data: "expiration_date"
+                },
+                {
+                    data: null,
+                    className: "dt-center editor-edit",
+                    defaultContent: '<i class="fa fa-pencil"/>',
+                    orderable: false
+                },
+                {
+                    data: null,
+                    className: "dt-center editor-delete",
+                    defaultContent: '<i class="fa fa-trash"/>',
+                    orderable: false
+                }
+            ]
+        });
+    });
+</script>
+
+
+{% endblock%}

@@ -3,6 +3,8 @@ from forms import AddUser, AddItemForm
 from flask_behind_proxy import FlaskBehindProxy
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import generate_password_hash as idHash 
+from data_table import *
+import re
 
 app = Flask(__name__)
 proxied = FlaskBehindProxy(app)  ## add this line
@@ -23,6 +25,15 @@ class food_item(db.Model):
     def __repr__(self):
         return f"Food({self.item_name}, {self.expiration_date})"
 
+    def to_dict(self):
+        return {
+            'id':self.id,
+            'item_name': self.item_name,
+            'item_category': self.item_category,
+            'purchase_date': self.purchase_date.strftime("%A - %m/%d/%Y"),
+            'expiration_date': self.expiration_date.strftime("%A - %m/%d/%Y"),
+        }
+
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -42,14 +53,6 @@ def home():
         return redirect(url_for('about'))
     else:
         return render_template('home.html', subtitle='Home')
-
-
-@app.route("/show")
-def show():
-    if not session.get("uuid"):
-        return render_template('show.html', subtitle='Items', food_items=food_item.query.all())
-    else:
-        return render_template('show.html', subtitle='Items', food_items=food_item.query.filter_by(uuid=session.get("uuid")))
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -84,10 +87,14 @@ def logout():
     session.clear()
     return redirect(url_for("about"))    
 
-@app.route("/add", methods=['GET', 'POST'])
-def add():
+
+@app.route("/add/<string:category>", methods=['GET', 'POST'])
+def add(category):
     if not session.get("uuid"):
         return redirect(url_for('login'))
+    
+    category = re.sub("-", " ", category)
+    category = re.sub("_", "/", category)
 
     form = AddItemForm()
     if form.validate_on_submit(): # checks if entries are valid
@@ -96,21 +103,63 @@ def add():
                         purchase_date=form.purchase_date.data,
                         expiration_date=form.expiration_date.data,
                         item_name=form.item_name.data,
-                        item_category=form.item_category.data
+                        item_category=category
                     )
         db.session.add(item)
         db.session.commit()
         flash(f'{form.item_name.data} added!', 'success')
         return redirect(url_for('home')) # if so - send to home page
-    return render_template('add.html', title='Add Item', form=form)
+    return render_template('add.html', title='Add Item', form=form, category=category)
+
+
+@app.route("/show")
+def show():
+    return render_template('show.html', subtitle="Test Table")
+    # if not session.get("uuid"):
+    #     return render_template('show.html', subtitle='Items', food_items=food_item.query.all())
+    # else:
+    #     return render_template('show.html', subtitle='Items', food_items=food_item.query.filter_by(uuid=session.get("uuid")))
+
+
+@app.route('/api/data')
+def data():
+    uuid = session.get("uuid")
+    (query, total_filtered) = filterTable(food_item, uuid)
+    query = sortQuery(food_item, query)
+    return queryResponse(food_item, uuid, query, total_filtered)
+
+
+@app.route('/api/remove/<string:item_name>', methods=['POST'])
+def remove(item_name):
+    uuid = session.get("uuid")
+    removeItem(db, food_item, uuid, [item_name])
+    return redirect(url_for("show"))
+
+@app.route('/api/update', methods=['POST'])
+def update():
+    uuid = session.get("uuid")
+    data = request.json
+    print(data)
+    # new_item = {
+    #     "id": data["id"],
+    #     "item_name": data["item_name"],
+    #     "item_category": data["item_category"],
+    #     "purchase_date": data["purchase_date"],
+    #     "expiration_date": data["expiration_date"]
+    # }
+    # print(new_item)
+    # updateItem(db, food_item, uuid, [item_name])
+    return redirect(url_for("show"))
 
 @app.route("/about", methods=['GET'])
 def about():
     return render_template('about.html', title='About')
 
+
 @app.route("/support", methods=['GET'])
 def support():
     return render_template('support.html', title='Support')
+
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0")

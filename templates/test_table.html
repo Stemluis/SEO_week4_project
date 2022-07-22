@@ -1,0 +1,173 @@
+{% extends "layout.html" %} {% block content %}
+<table id="data" class="table table-striped hover">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Purchase Date</th>
+            <th>Expiration Date</th>
+        </tr>
+    </thead>
+</table>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        let table = $('#data').DataTable({
+            ajax: '/api/data',
+            serverSide: true,
+            responsive: true,
+            select: true,
+            columns: [{
+                    data: 'id',
+                    orderable: false,
+                    searchable: false,
+                    visible: false
+                }, {
+                    data: 'item_name',
+                    orderable: true,
+                    searchable: true,
+                    className: 'editable text'
+                },
+                {
+                    data: 'item_category',
+                    orderable: true,
+                    searchable: false,
+                    className: 'editable selection'
+                },
+                {
+                    data: 'purchase_date',
+                    orderable: true,
+                    searchable: false,
+                    className: 'editable date'
+                },
+                {
+                    data: 'expiration_date',
+                    orderable: true,
+                    searchable: false,
+                    className: 'editable date'
+                }
+            ],
+            dom: "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-8'i><'col-sm-12 col-md-2'l><'col-sm-12 col-md-2'p>>",
+            buttons: [{
+                    text: 'Remove',
+                    className: 'removeButton',
+                    action: function (e, dt, node, config) {
+                        remove();
+                    }
+                },
+                {
+                    text: 'Edit',
+                    className: 'editButton'
+                }
+            ]
+        });
+
+        // $('#data tbody').on('click', 'tr', function () {
+        //     if ($(this).hasClass('selected')) {
+        //         $(".removeButton").css("background-color", "grey")
+        //     } else {
+        //         $(".removeButton").css("background-color", "red")
+        //     }
+        // });
+
+        // function remove() {
+        //     var name = table.row('.selected').data().item_name
+        //     table.row('.selected').remove().draw(false);
+        //     $.ajax({
+        //         url: '/api/remove/' + name,
+        //         type: 'POST'
+        //     })
+        //     $.ajax.reload()
+        // }
+
+        // function getRowData() {
+        //     return table.row('.selected').data();
+        // }
+
+        // function convertDate(full_date) {
+        //     let date = new Date(full_date)
+        //     return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
+        // }
+
+
+        $('#data').on('mouseenter', 'td.editable', function (e) {
+            e.preventDefault()
+            if (e.target.localName != 'input') {
+                let row = e.target._DT_CellIndex.row
+                let col = e.target._DT_CellIndex.column
+                let inputType = e.target.className.split("e ")[1]
+                if (!e.target.children.length) {
+                    e.target.innerHTML =
+                        `<input id="${row}-${col}" type="${inputType}" class="editor" value="${e.target.innerHTML}">`
+                }
+            }
+        })
+
+        // when the mouse exits the editor, write the data into the table and redraw
+        $('#data').on('mouseleave', 'td.editable', function (e) {
+            e.preventDefault()
+            if (e.target.localName != 'input') {
+                let row = e.target._DT_CellIndex.row
+                let col = e.target._DT_CellIndex.column
+                table.cell(row, col).data(e.target.firstElementChild.value)
+                table.draw() // up to you
+            } else { // forces write when there is an event delay
+                let [row, col] = e.target.id.split('-')
+                table.cell(Number(row), Number(col)).data(e.target.value)
+            }
+            table.draw()
+        })
+
+        // let old;
+        // $(".editButton").on('click', function (e) {
+        //     if ($(this).text() == "Save") {
+        //         data = getRowData()
+        //         console.log(data['item_name'].value)
+        //         $.ajax({
+        //             type: "POST",
+        //             url: "/api/update",
+        //             data: JSON.stringify(data),
+        //             contentType: 'application/json;charset=UTF-8',
+        //             success: function (result) {
+        //                 // console.log(result);
+        //             }
+        //         })
+        //         $(this).text("Edit");
+        //     } else {
+        //         old = getRowData();
+        //         table.row('.selected').data({
+        //             expiration_date: `<input type='date' value=${convertDate(old.expiration_date)}>`,
+        //             id:table.row('.selected').data().id,
+        //             item_category: 
+        //                 `<select name="category" id="category_select" selected="${old.item_category}"'>
+        //                     <option value="Grocery">Grocery</option>
+        //                     <option value="Fruits">Fruits</option>
+        //                     <option value="Vegetables">Vegetables</option>
+        //                     <option value="Canned Goods">Canned Goods</option>
+        //                     <option value="Dairy">Dairy</option>
+        //                     <option value="Meat">Meat</option>
+        //                     <option value="Seafood">Seafood</option>
+        //                     <option value="Deli">Deli</option>
+        //                     <option value="Condiments/Spices">Condiments/Spices</option>
+        //                     <option value="Snacks">Snacks</option>
+        //                     <option value="Bread/Baked Goods">Bread/Baked Goods</option>
+        //                     <option value="Beverages">Beverages</option>
+        //                     <option value="Pasta/Rice/Cereal">Pasta/Rice/Cereal</option>
+        //                     <option value="Baking">Baking</option>
+        //                     <option value="Frozen Foods">Frozen Foods</option>
+        //                 </select>`,
+        //             item_name: `<input type='text' value=${old.item_name}>`,
+        //             purchase_date: `<input type='date' value=${convertDate(old.purchase_date)}>`,
+        //         })
+        //     }
+        //     $(this).text("Save");
+        // });
+    });
+</script>
+{% endblock%}
